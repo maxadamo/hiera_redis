@@ -2,7 +2,7 @@ Puppet::Functions.create_function(:redis_lookup_key) do
   begin
     require 'redis'
   rescue LoadError
-    raise Puppet::DataBinding::LookupError, '[hiera-redis] The redis gem must be installed to use hiera-redis'
+    raise Puppet::DataBinding::LookupError, 'The redis gem must be installed to use redis_lookup_key'
   end
 
   dispatch :redis_lookup_key do
@@ -14,22 +14,37 @@ Puppet::Functions.create_function(:redis_lookup_key) do
   def redis_lookup_key(key, options, context)
     return context.cached_value(key) if context.cache_has_key(key)
 
-    result = redis_get(key, options)
+    host      = options['host']      || 'localhost'
+    port      = options['port']      || 6379
+    db        = options['db']        || 0
+    scopes    = options['scopes']    || [options['scope']]
+    separator = options['separator'] || ':'
+
+    redis  = Redis.new(host: host, port: port, db: db)
+    result = nil
+
+    scopes.each do |scope|
+      redis_key = scope.nil? ? key : [scope, key].join(separator)
+      result = redis_get(redis, redis_key)
+      break unless result.nil?
+    end
 
     context.not_found if result.nil?
     context.cache(key, result)
   end
 
-  def redis_get(key, options)
-    redis = Redis.new(host: 'localhost', port: 6379, db: 0)
-
-    scopes = options['scopes']
-
-    scopes.each do |scope|
-      result = redis.get([scope, key].join(':'))
-      return result unless result.nil?
+  def redis_get(redis, key)
+    case redis.type(key)
+    when 'string'
+      redis.get(key)
+    when 'list'
+      redis.lrange(key, 0, -1)
+    when 'set'
+      redis.smembers(key)
+    when 'zset'
+      redis.zrange(key, 0, -1)
+    when 'hash'
+      redis.hgetall(key)
     end
-
-    nil
   end
 end
