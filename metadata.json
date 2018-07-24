@@ -1,8 +1,8 @@
 {
   "name": "andrewm3-hiera_redis",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "andrewm3",
-  "summary": "",
+  "summary": "A Hiera 5 backend for Redis",
   "license": "Apache-2.0",
   "source": "https://github.com/andrewm3/hiera_redis",
   "dependencies": [
@@ -30,7 +30,8 @@
     {
       "operatingsystem": "Scientific",
       "operatingsystemrelease": [
-        "7" ]
+        "7"
+      ]
     },
     {
       "operatingsystem": "Debian",
@@ -42,14 +43,6 @@
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
         "16.04"
-      ]
-    },
-    {
-      "operatingsystem": "windows",
-      "operatingsystemrelease": [
-        "2008 R2",
-        "2012 R2",
-        "10"
       ]
     }
   ],

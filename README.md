@@ -1,21 +1,9 @@
-
 # hiera_redis
-
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
-
-
-
-
-
-
 
 #### Table of Contents
 
 1. [Description](#description)
 2. [Setup - The basics of getting started with hiera_redis](#setup)
-    * [What hiera_redis affects](#what-hiera_redis-affects)
     * [Setup requirements](#setup-requirements)
     * [Beginning with hiera_redis](#beginning-with-hiera_redis)
 3. [Usage - Configuration options and additional functionality](#usage)
@@ -24,72 +12,63 @@ The README template below provides a starting point with details about what info
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
-
-This should be a fairly short description helps the user decide if your module is what they want.
-
+This module provides a Hiera 5 backend for Redis.
 
 ## Setup
 
-### What hiera_redis affects **OPTIONAL**
+### Setup Requirements
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
+The backend requires the [redis](https://github.com/redis/redis-rb) gem installed in the Puppet Server JRuby.
+It can be installed with:
 
-If there's more that they should know about, though, this is the place to mention:
+    /opt/puppetlabs/bin/puppetserver gem install redis
 
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
+It is also recommended to install the gem into the agent's Ruby:
 
-### Setup Requirements **OPTIONAL**
+    /opt/puppetlabs/puppet/bin/gem install redis
 
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+This allows commands such as `puppet apply` or `puppet lookup` to use the backend.
 
 ### Beginning with hiera_redis
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+If Redis is running on the Puppet master with the default settings, specifying the `lookup_key` as 'redis_lookup_key' is sufficient, for example:
+
+    ---
+    version: 5
+    hierarchy:
+      - name: hiera_redis
+        lookup_key: redis_lookup_key
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
+By default, the backend will query Redis with the key provided.
+It is also possible to query multiple scopes such as with the YAML backend, where the expected key in Redis is composed of the scope and the key separated by a character (default is `:`). For example, the following can be used:
 
-## Reference
+    ---
+    version: 5
+    hierarchy:
+      - name: hiera_redis
+        lookup_key: redis_lookup_key
+        options:
+          scopes:
+            - osfamily/%{facts.os.family}
+            - common
 
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
+The backend then expects keys of a format such as `common:foo::bar` for a lookup of 'foo::bar'.
 
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
+The other options available include:
 
-For each element (class, defined type, function, and so on), list:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
-For example:
-
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
-```
+* `host`: The host that Redis is located on. Defaults to 'localhost'.
+* `port`: The port that Redis is running on. Defaults to 6379.
+* `db`: The database number to query on the Redis instance. Defaults to 0.
+* `scope`: The scope to use when querying the database.
+* `scopes`: An array of scopes to query. Cannot be used in conjunction with the `scope` option.
+* `separator`: The character separator between the scope and key being queried. Defaults to ':'.
 
 ## Limitations
 
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
+This module has only been tested on CentOS.
 
 ## Development
 
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
-
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
+PRs welcome.
