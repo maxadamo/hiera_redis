@@ -51,7 +51,7 @@ It is also possible to query multiple scopes such as with the YAML backend, wher
         lookup_key: redis_lookup_key
         options:
           scopes:
-            - osfamily/%{facts.os.family}
+            - "osfamily/%{facts.os.family}"
             - common
 
 The backend then expects keys of a format such as `common:foo::bar` for a lookup of 'foo::bar'.
@@ -60,6 +60,8 @@ The other options available include:
 
 * `host`: The host that Redis is located on. Defaults to 'localhost'.
 * `port`: The port that Redis is running on. Defaults to 6379.
+* `socket`: Optional Unix socket path
+* `password`: Optional Redis password
 * `db`: The database number to query on the Redis instance. Defaults to 0.
 * `scope`: The scope to use when querying the database.
 * `scopes`: An array of scopes to query. Cannot be used in conjunction with the `scope` option.

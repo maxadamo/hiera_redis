@@ -16,11 +16,21 @@ Puppet::Functions.create_function(:redis_lookup_key) do
 
     host      = options['host']      || 'localhost'
     port      = options['port']      || 6379
+    socket    = options['socket']    || nil
+    password  = options['password']  || nil
     db        = options['db']        || 0
     scopes    = options['scopes']    || [options['scope']]
     separator = options['separator'] || ':'
 
-    redis  = Redis.new(host: host, port: port, db: db)
+    redis = if !socket.nil? && !password.nil?
+              Redis.new(path: socket, password: password, db: db)
+            elsif !socket.nil? && password.nil?
+              Redis.new(path: socket, db: db)
+            elsif socket.nil? && !password.nil?
+              Redis.new(password: password, host: host, port: port, db: db)
+            else
+              Redis.new(host: host, port: port, db: db)
+            end
     result = nil
 
     scopes.each do |scope|
