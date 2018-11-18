@@ -18,7 +18,7 @@ Puppet::Functions.create_function(:redis_lookup_key) do
       raise ArgumentError, '[hiera-redis] confine_to_keys must be an array' unless confine_keys.is_a?(Array)
 
       begin
-        confine_keys = confine_keys.map {|r| Regexp.new(r) }
+        confine_keys = confine_keys.map { |r| Regexp.new(r) }
       rescue StandardError => e
         raise Puppet::DataBinding::LookupError, "[hiera-redis] creating regexp failed with: #{e}"
       end
