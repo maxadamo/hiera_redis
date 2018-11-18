@@ -14,7 +14,7 @@ Puppet::Functions.create_function(:redis_lookup_key) do
   def redis_lookup_key(key, options, context)
     return context.cached_value(key) if context.cache_has_key(key)
 
-    if confine_keys = options['confine_to_keys']
+    if (confine_keys = options['confine_to_keys'])
       raise ArgumentError, '[hiera-redis] confine_to_keys must be an array' unless confine_keys.is_a?(Array)
 
       begin
