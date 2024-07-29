@@ -1,6 +1,6 @@
 # hiera_redis
 
-#### Table of Contents
+## Table of Contents
 
 1. [Description](#description)
 2. [Setup - The basics of getting started with hiera_redis](#setup)
@@ -21,17 +21,21 @@ This module provides a Hiera 5 backend for Redis.
 The backend requires the [redis](https://github.com/redis/redis-rb) gem installed in the Puppet Server JRuby.
 It can be installed with:
 
-    /opt/puppetlabs/bin/puppetserver gem install redis
+```bash
+/opt/puppetlabs/bin/puppetserver gem install redis
+```
 
 It is also recommended to install the gem into the agent's Ruby:
 
-    /opt/puppetlabs/puppet/bin/gem install redis
+```bash
+/opt/puppetlabs/puppet/bin/gem install redis
+```
 
 This allows commands such as `puppet apply` or `puppet lookup` to use the backend.
 
 ### Beginning with hiera_redis
 
-If Redis is running on the Puppet master with the default settings, specifying the `lookup_key` as 'redis_lookup_key' is sufficient, for example:
+If Redis is running on the Puppet master with the default settings, specifying the `lookup_key` as 'redis_lookup_key' is sufficient, for example
 
 ```yaml
 ---
